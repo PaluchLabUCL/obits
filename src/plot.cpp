@@ -186,7 +186,6 @@ void PlotCamera::setUniforms(GLuint &theProgram){
 
 void PlotCamera::preparePlot(Plot* plt, GLuint &theProgram){
 
-
     for(int i = 0; i<4; i++){
         color[i] = plt->color[i];
     }

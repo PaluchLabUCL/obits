@@ -14,7 +14,7 @@
 #include <vector>
 #include <pthread.h>
 #include "unistd.h"
-
+#include <iostream>
 
 
 class Plot{
