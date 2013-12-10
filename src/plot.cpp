@@ -4,17 +4,25 @@
 
 void PlotWindow::showPlot(){
     printf("initting glfw\n");
-    GLuint theProgram = Framework::initializeWindow();
+    window = Framework::initializeWindow();
+
+    if(window==0){
+        printf("failed to load glfw\n");
+        exit(1);
+    }
+
+    GLuint theProgram = Framework::loadProgram();
 
     GetError();
 
     int height, width;
-    glfwGetWindowSize( &width, &height );
+    glfwGetWindowSize(window, &width, &height );
+
     camera = new PlotCamera(theProgram);
     
     camera->resizeWindow((float)width, (float)height);
     
-    PlotInteractor* input = new PlotInteractor(camera);
+    input = new PlotInteractor(camera, window);
     
     size_t plot_no=0;
     while( input->running==GL_TRUE )
@@ -27,29 +35,60 @@ void PlotWindow::showPlot(){
         
         input->update();
         
+        if(setting){
+            input->setCharacter(setting);
+            setting=0;
+        }
         
         GetError();
         while(!queued.empty()){
-            Plot* p = queued.back();
-            queued.pop_back();
-            p->prepareBuffers(theProgram);
-            plots.push_back(p);
-            plot_no = plots.size();
+            Drawable* d = queued.front();
+            queued.pop();
+            d->initialize(theProgram);
+            plots.push_back(d);
         }
-        
-        for(size_t i = 0; i<plot_no; i++){
-            plots[i]->refreshBuffers(theProgram);
-            camera->preparePlot(plots[i], theProgram);
-            plots[i]->draw(theProgram);
+
+        glfwGetWindowSize(window, &width, &height );
+        camera->resizeWindow((float)width, (float)height);
+
+        for(std::list<Drawable*>::iterator pi=plots.begin(); pi!=plots.end(); pi++){
+            Drawable* p = *pi;
+            if(p->toRemove()){
+                dying.push(p);
+            } else{
+                p->draw();
+            }
         }
         
         // Swap front and back rendering buffers
-        glfwSwapBuffers();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
 
-        
-       
+        while(!dying.empty()){
+            Drawable* dead = dying.front();
+            dying.pop();
+            bool removed = false;
+
+            for(std::list<Drawable*>::iterator pi=plots.begin(); pi!=plots.end(); pi++){
+                Drawable* candidate = *pi;
+                if(dead==candidate){
+
+                    plots.erase(pi);
+                    removed=true;
+                    break;
+                }
+            }
+
+            if(removed==false){
+                printf("object scheduled to be removed was not removed\n plot.cpp line 79\n");
+                exit(-1);
+            } else{
+                delete dead;
+            }
+        }
+
     }
-    
+
     // Close window and terminate GLFW
     glfwTerminate();
     
@@ -58,12 +97,17 @@ void PlotWindow::showPlot(){
     
 }
 
-void PlotWindow::addPlot(Plot* p){
-        queued.push_back(p);
+void PlotWindow::addDrawable(Drawable* d){
+        queued.push(d);
         
 }
+
+void PlotWindow::setPlayerCharacter(Character *c){
+    setting=c;
+}
+
 Plot::Plot(double* x, double* y, int length){
-    dataBuffer = new double[2*length];
+    dataBuffer = new float[2*length];
 
     for(int i = 0; i<length; i++){
         dataBuffer[2*i] = x[i];
@@ -97,8 +141,8 @@ void Plot::prepareBuffers(GLuint &theProgram){
     
     glEnableVertexAttribArray(index);
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(double)*2*len, dataBuffer, GL_STREAM_DRAW);
-    glVertexAttribPointer(index, 2, GL_DOUBLE, GL_FALSE, 0, 0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*2*len, dataBuffer, GL_STREAM_DRAW);
+    glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     GetError();
 
@@ -125,7 +169,7 @@ void Plot::refreshBuffers(GLuint &theProgram){
 void Plot::bufferChanged(double* x, double* y, int length){
     if(len!=length){
         delete [] dataBuffer;
-        dataBuffer=new double[2*length];
+        dataBuffer=new float[2*length];
         len=length;
     }
     for(int i = 0; i<len; i++){
@@ -137,18 +181,27 @@ void Plot::bufferChanged(double* x, double* y, int length){
 
 
 
-void Plot::draw(GLuint &theProgram){
+void Plot::draw(){
+
+    GLuint center = glGetUniformLocation(theProgram, "center");
+    GLuint orientation = glGetUniformLocation(theProgram, "orientation");
 
     glUseProgram(theProgram);
+    glUniform2fv(center, 1, ORIGIN);
+    glUniformMatrix2fv(orientation, 1, GL_FALSE, IDENTITY);
     glBindVertexArray(vao);
     glDrawArrays(GL_LINE_STRIP, 0, len);
     GetError();
-    
     glBindVertexArray(0);
     
     glUseProgram(0);
     
 
+}
+
+void Plot::initialize(GLuint &proggy){
+    theProgram = proggy;
+    prepareBuffers(theProgram);
 }
 
 PlotCamera::PlotCamera(GLuint &theProgram){
@@ -167,6 +220,11 @@ PlotCamera::PlotCamera(GLuint &theProgram){
     for(int i = 0; i<4; i++){
         color[i] = 1.0;
     }
+    center = new float[2];
+    center[0] = 0;
+    center[1] = 0;
+
+    this->theProgram=theProgram;
 
     setUniforms(theProgram);
 }
@@ -184,38 +242,181 @@ void PlotCamera::setUniforms(GLuint &theProgram){
     glUseProgram(0);
 }
 
-void PlotCamera::preparePlot(Plot* plt, GLuint &theProgram){
 
-    for(int i = 0; i<4; i++){
-        color[i] = plt->color[i];
-    }
+float scale = 10;
+void PlotCamera::resizeWindow(float w, float h){
+     //nothing yet.
+    float longer = w>h?w:h;
+    float xscale = longer/h;
+    float yscale = longer/w;
+    float xmin = center[0] - scale*xscale;
+    float xmax = center[0] + scale*xscale;
+    float ymin = center[1] - scale*yscale;
+    float ymax = center[1] + scale*yscale;
 
-    float xfactor = 1/(plt->maxx - plt->minx);
-    float yfactor = 1/(plt->maxy - plt->miny);
+    offset[0] = -(xmax + xmin)/(xmax - xmin);
+    offset[1] = -(ymax + ymin)/(ymax - ymin);
+    scaleMatrix[0] = 2.0f/(xmax - xmin);
+    scaleMatrix[3] = 2.0f/(ymax - ymin);
 
-    scaleMatrix[0] = 2*xfactor;
-    scaleMatrix[3] = 2*yfactor;
-
-    offset[0] = -(1 + 2*xfactor*plt->minx);
-    offset[1] = -(1 + 2*yfactor*plt->miny);
     setUniforms(theProgram);
 }
 
-
-void PlotCamera::resizeWindow(float w, float h){
- //nothing yet.   
-    
-}
-
-
-
-PlotInteractor::PlotInteractor(PlotCamera* cam){
+Character* PlotInteractor::character = 0;
+PlotInteractor::PlotInteractor(PlotCamera* cam, GLFWwindow* win){
+    window = win;
+    //character = (Character*)0;
     running=GL_TRUE;
 }
 
 
 
 void PlotInteractor::update(){
-    // Check if ESC key was pressed or window was closed
-    running = !glfwGetKey( GLFW_KEY_ESC ) &&  glfwGetWindowParam( GLFW_OPENED );
+    running = !(glfwWindowShouldClose(window)||glfwGetKey(window, GLFW_KEY_ESCAPE));
+}
+
+
+void PlotInteractor::setCharacter(Character* c){
+    PlotInteractor::character = c;
+    glfwSetKeyCallback(window, keyCallback);
+}
+
+void PlotInteractor::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if(character==0) return;
+    if(key==GLFW_KEY_UP){
+        character->setAcceleration(action);
+    } else if(key==GLFW_KEY_DOWN){
+        character->setAcceleration(-1*action);
+    }
+}
+
+Character::Character(float h, float w){
+    initialized=false;
+
+    obj=0;
+    color = new float[3];
+    center = new float[2];
+    rotation_matrix = new float[4];
+    positionBuffer = new float[8];
+    indexBuffer = new int[6];
+
+    color[0] = 1;
+    color[1] = 1;
+    color[2] = 1;
+    height = h;
+    width = h;
+
+}
+
+void Character::setAcceleration(double direction){
+    obj->accelerate(direction);
+}
+
+void Character::draw(){
+
+    if(obj!=0){
+        center[0] = obj->x;
+        center[1] = obj->y;
+    }
+
+    GLuint centerUniform = glGetUniformLocation(theProgram, "center");
+    GLuint orientationUniform = glGetUniformLocation(theProgram, "orientation");
+    GLuint colorUniform = glGetUniformLocation(theProgram, "plotColor");
+    glUseProgram(theProgram);
+    glUniform2fv(centerUniform, 1, center);
+    glUniformMatrix2fv(orientationUniform, 1, GL_FALSE, rotation_matrix);
+    glUniform3fv(colorUniform, 1, color );
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, (int)6, GL_UNSIGNED_INT, 0);
+
+    GetError();
+    glBindVertexArray(0);
+
+    glUseProgram(0);
+}
+
+void Character::initialize(GLuint &proggy){
+    theProgram = proggy;
+    //center = new float[2];
+
+    center[0] = 0;
+    center[1] = 0;
+
+    //rotation_matrix = new float[4];
+    for(int i = 0; i<4; i++){
+        rotation_matrix[i] = IDENTITY[i];
+    }
+    /*
+    float buff[8] = {
+            -width, -height,
+            -width, height,
+             width, height,
+             width, -height
+    };
+    positionBuffer = &buff[0];
+    */
+    //positionBuffer = new float[8];
+    positionBuffer[0] = -width;
+    positionBuffer[2] = -width;
+    positionBuffer[4] = width;
+    positionBuffer[6] = width;
+    positionBuffer[1] = -height;
+    positionBuffer[3] = height;
+    positionBuffer[5] = height;
+    positionBuffer[7] = -height;
+    /*
+    int ibuff[6] = {
+        0, 2, 1,
+        0, 3, 2
+    };
+
+    indexBuffer = &ibuff[0];
+    */
+    //indexBuffer = new int[6];
+
+    indexBuffer[0] = 0; indexBuffer[1] = 2; indexBuffer[2] = 1;
+    indexBuffer[3] = 0; indexBuffer[4] = 3; indexBuffer[5] = 2;
+
+
+
+    glUseProgram(theProgram);
+
+
+
+
+    glGenBuffers(1, &positionBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*8, positionBuffer, GL_STREAM_DRAW);
+
+    glGenBuffers(1, &indexBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*6, indexBuffer, GL_STREAM_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    GLuint index = glGetAttribLocation(theProgram, "xyPosition");
+    glEnableVertexAttribArray(index);
+    glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferObject);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    initialized=true;
+}
+
+
+void Character::setDynamicObject(DynamicObject *obj){
+    this->obj = obj;
+}
+
+void Character::setColor(float r, float g, float b){
+    color[0] = r;
+    color[1] = g;
+    color[2] = b;
+}
+
+bool Character::toRemove(){
+
+    return obj->toRemove();
 }

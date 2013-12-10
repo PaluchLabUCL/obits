@@ -156,55 +156,62 @@ GLuint initializeWindow(){
 }
 #else
 
-GLuint initializeWindow(){
-    if( glfwInit() != GL_TRUE ) {
-        exit( EXIT_FAILURE );
+GLFWwindow* initializeWindow(){
+    /*
+     *Creating and initlizing a window on mac.
+     *
+     **/
+    GLFWwindow* window;
+
+    /* Initialize the library */
+    if (!glfwInit()){
+        printf("could not initialize window\n");
+        return (GLFWwindow*)0;
     }
-    
-    
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
-    glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    printf("to here.\n");
-    
-    
-    // Open an OpenGL window
-    if( glfwOpenWindow(600, 400, 5, 6, 5,0, 0, 0, GLFW_WINDOW) != GL_TRUE )
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    window = glfwCreateWindow(640, 480, "orbits", NULL, NULL);
+    if (!window)
     {
-        printf("failed to open window.\n");
-        GetError();
+        printf("failed to create window\n");
         glfwTerminate();
-        exit( EXIT_FAILURE );
+        return (GLFWwindow*)0;
     }
-    
-    glfwSetWindowTitle("OpenGL plotting window");
-    
+
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+
     printf("GLSL version %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    printf("GL Version: %s", glGetString(GL_VERSION));
-    
+    printf("GL Version: %s\n", glGetString(GL_VERSION));
+
     glEnable(GL_DEPTH_TEST);
     
-    glDepthFunc(GL_LEQUAL);
+    /*glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     glDepthRange(0.0f, 1.0f);
-    
+    */
     glClearColor( 0.02f, 0.02f, 0.02f, 0.0f );
     glClearDepth( 1.0f );
-	glEnable(GL_CULL_FACE);
+    /*glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
-    printf("setup\n");
-    //Load program.
-    std::vector<GLuint> shaderList;
-	
-	shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "vertex.shader"));
-	shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "fragment.shader"));
-    GetError();
-	return Framework::CreateProgram(shaderList);
+    glFrontFace(GL_CCW);*/
+    printf("window setup complete\n");
+    return window;
 }
 
 #endif
+GLuint loadProgram(){
+    //Load program.
+    std::vector<GLuint> shaderList;
 
+    shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "vertex.shader"));
+    shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "fragment.shader"));
+    GetError();
+    return Framework::CreateProgram(shaderList);
+
+}
 }

@@ -2,12 +2,12 @@
 #define FRAMEWORK_H
 #ifndef __APPLE__
     #include <GL/glew.h>
-    #include "GL/glfw.h"
+    #include "GLFW/glfw3.h"
     #define SHADER_VERSION_STRING "#version 130\n\n"
 #else
-    #define GLFW_INCLUDE_GL3
+    #define GLFW_INCLUDE_GLCOREARB
     #define GLFW_NO_GLU
-    #include "GL/glfw.h"
+    #include "GLFW/glfw3.h"
     #define SHADER_VERSION_STRING "#version 150\n\n"
 #endif
 
@@ -32,7 +32,8 @@ namespace Framework
 	GLuint CreateProgram(const std::vector<GLuint> &shaderList);
     void multiplyMatrix4x4(float* A, float* B, float* C);
     float* multiplyMatrixVector4(float* A, float* b);
-    GLuint initializeWindow();
+    GLFWwindow* initializeWindow();
+    GLuint loadProgram();
 }
 
 #endif //FRAMEWORK_H
