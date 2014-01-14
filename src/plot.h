@@ -56,6 +56,7 @@ class Character : public Drawable{
         void setColor(float r, float g, float c);
         bool toRemove();
         void setAcceleration(double direction);
+        void setSteer(double direction);
         ~Character(){shutdown();}
         void shutdown(){
             if(deleted) exit(-1); else deleted=true;

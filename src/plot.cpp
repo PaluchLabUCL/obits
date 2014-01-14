@@ -287,6 +287,10 @@ void PlotInteractor::keyCallback(GLFWwindow* window, int key, int scancode, int 
         character->setAcceleration(action);
     } else if(key==GLFW_KEY_DOWN){
         character->setAcceleration(-1*action);
+    } else if(key==GLFW_KEY_LEFT){
+        character->setSteer(1*action);
+    } else if(key==GLFW_KEY_RIGHT){
+        character->setSteer(-1*action);
     }
 }
 
@@ -312,11 +316,21 @@ void Character::setAcceleration(double direction){
     obj->accelerate(direction);
 }
 
+void Character::setSteer(double direction){
+    obj->steer(direction);
+}
+
 void Character::draw(){
 
     if(obj!=0){
         center[0] = obj->x;
         center[1] = obj->y;
+
+        rotation_matrix[0] = obj->rotation[0];
+        rotation_matrix[1] = obj->rotation[1];
+        rotation_matrix[2] = obj->rotation[2];
+        rotation_matrix[3] = obj->rotation[3];
+
     }
 
     GLuint centerUniform = glGetUniformLocation(theProgram, "center");

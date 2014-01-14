@@ -139,10 +139,16 @@ PlayerBox::PlayerBox(){
     height = 0.5;
     vx = 0.0;
     vy = 0.0;
+    velocity=0;
     remove = false;
     count = 0;
     acc=0;
     angle=0;
+    alpha=0;
+    rotation[0] = 1;
+    rotation[1] = 0;
+    rotation[2] = 0;
+    rotation[3] = 1;
     box = new BoundingBox();
 
 }
@@ -172,16 +178,43 @@ void PlayerBox::impact(float rating){
 
 void PlayerBox::accelerate(float value){
     acc=value;
+}
 
+void PlayerBox::steer(float value){
+    alpha=value;
 }
 
 void PlayerBox::move(){
+    velocity = sqrt(vx*vx + vy*vy);
 
-    float cs = cos(angle);
-    float sn = sin(angle);
+    if(velocity>0){
+        rotation[0] = vy/velocity;
+        rotation[1] = -vx/velocity;
+        rotation[2] = vx/velocity;
+        rotation[3] = vy/velocity;
+    }
 
-    vx += cs*acc*DT;
-    vy += sn*acc*DT;
+    if(alpha!=0){
+        float a = cos(-alpha*0.0005);
+        float b = sin(-alpha*0.0005);
+        float c = rotation[0]*a - rotation[2]*b;
+        float s = rotation[0]*b + rotation[2]*a;
+
+        float mag = 1.0/sqrt(c*c + s*s);
+
+
+        rotation[0] = c*mag;
+        rotation[2] = s*mag;
+
+        rotation[1] = -rotation[2];
+        rotation[3] = rotation[0];
+
+    }
+
+    velocity = 0.995*velocity + acc*DT;
+
+    vx = rotation[2]*velocity;
+    vy = rotation[0]*velocity;
 
     x += vx*DT;
     y += vy*DT;

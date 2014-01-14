@@ -22,12 +22,14 @@ public:
     float count;
     float width;
     float height;
+    float rotation[4] = {1,0,0,1};
     virtual BoundingBox* getBoundingBox();
     virtual void move();
     virtual bool toRemove();
     virtual void setToRemove();
     virtual void impact(float rating);
     virtual void accelerate(float value){}
+    virtual void steer(float value){}
     virtual ~DynamicObject(){}
 
 };
@@ -52,7 +54,8 @@ class PlayerBox: public DynamicObject{
     bool remove;
     float acc;
     float angle;
-
+    float alpha;
+    float velocity;
     public:
         PlayerBox();
         BoundingBox* getBoundingBox();
@@ -60,6 +63,7 @@ class PlayerBox: public DynamicObject{
         void setToRemove();
         void impact(float rating);
         void accelerate(float value);
+        void steer(float value);
         void move();
         ~PlayerBox(){
             delete box;
