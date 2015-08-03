@@ -88,8 +88,8 @@ void* start_main_loop(void* ptr){
 void generateObjects(PlotWindow* win, DynamicsWorld* world){
     for(int i = 0; i<50; i++){
 
-        float w = 0.2;
-        float h = 0.2;
+        float w = 0.02;
+        float h = 0.02;
 
         DynamicObject* obj = new BouncingBox(w,h);
         world->addDynamicObject(obj);
