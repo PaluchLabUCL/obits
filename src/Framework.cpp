@@ -23,12 +23,13 @@ namespace Framework
 			glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
 
 			const char *strShaderType = NULL;
+
 			switch(eShaderType)
 			{
 			    case GL_VERTEX_SHADER: strShaderType = "vertex"; break;
 			    case GL_GEOMETRY_SHADER: strShaderType = "geometry"; break;
 			    case GL_FRAGMENT_SHADER: strShaderType = "fragment"; break;
-			}
+            }
 
 			fprintf(stderr, "Compile failure in %s shader named \"%s\". Error:\n%s\n",
 				strShaderType, strShaderName.c_str(), strInfoLog);

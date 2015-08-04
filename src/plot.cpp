@@ -41,6 +41,8 @@ void PlotWindow::showPlot(){
         }
         
         GetError();
+
+        
         while(!queued.empty()){
             Drawable* d = queued.front();
             queued.pop();
@@ -54,7 +56,7 @@ void PlotWindow::showPlot(){
         for(std::list<Drawable*>::iterator pi=plots.begin(); pi!=plots.end(); pi++){
             Drawable* p = *pi;
             if(p->toRemove()){
-                dying.push(p);
+            	dying.push(p);
             } else{
                 p->draw();
             }
@@ -65,6 +67,7 @@ void PlotWindow::showPlot(){
         glfwPollEvents();
 
         while(!dying.empty()){
+        	printf("killing!\n");
             Drawable* dead = dying.front();
             dying.pop();
             bool removed = false;
@@ -98,7 +101,7 @@ void PlotWindow::showPlot(){
 }
 
 void PlotWindow::addDrawable(Drawable* d){
-        queued.push(d);
+    queued.push(d);
         
 }
 

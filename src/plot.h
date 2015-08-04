@@ -15,6 +15,7 @@
 #include <queue>
 #include <deque>
 #include <pthread.h>
+#include <thread>
 #include "unistd.h"
 #include <iostream>
 #include "world.h"
@@ -68,6 +69,7 @@ class Character : public Drawable{
             delete[] center;
             delete[] rotation_matrix;
             delete[] color;
+            printf("deleting!\n");
             delete obj;
         }
 
@@ -124,6 +126,7 @@ class PlotWindow{
     std::list<Drawable*> plots;
     std::queue<Drawable*> queued;
     std::queue<Drawable*> dying;
+    std::mutex mutex;
     public:
         void showPlot();
         void addDrawable(Drawable* d);

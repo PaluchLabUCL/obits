@@ -19,7 +19,7 @@ void DynamicsWorld::update(){
            obj->vx = -obj->vx;
            obj->impact(1.0f);
            if(obj->count>10){
-               to_remove.push(obj);
+               //to_remove.push(obj);
            }
 
         }
@@ -28,9 +28,10 @@ void DynamicsWorld::update(){
             obj->vy = -obj->vy;
             obj->impact(1.0f);
             if(obj->count>10){
-                to_remove.push(obj);
+                //to_remove.push(obj);
             }
         }
+        /*
         std::list<DynamicObject*>::iterator odoi = doi;
         odoi++;
         for(; odoi!=dynamic_objects.end(); odoi++){
@@ -55,7 +56,8 @@ void DynamicsWorld::update(){
 
                 }
             }
-        }
+
+        }*/
 
 
         obj->move();
@@ -86,9 +88,10 @@ void DynamicObject::impact(float rating){
 }
 
 void DynamicObject::setToRemove(){
-
+    remove = true;
 }
 bool DynamicObject::toRemove(){
+	return remove;
 }
 
 void DynamicObject::move(){
@@ -107,19 +110,11 @@ BouncingBox::BouncingBox(float w, float h){
     height = h;
     vx = 0.0;
     vy = 0.0;
-    remove = false;
     count = 0;
     box = new BoundingBox();
 
 }
 
-void BouncingBox::setToRemove(){
-    remove = true;
-}
-
-bool BouncingBox::toRemove(){
-    return remove;
-}
 
 BoundingBox* BouncingBox::getBoundingBox(){
     float left = vx>0?0:-vx;
@@ -131,6 +126,57 @@ BoundingBox* BouncingBox::getBoundingBox(){
 
     return box;
 }
+
+FlockBox::FlockBox(float w, float h){
+    x = 0;
+    y = 0;
+    width = w;
+    height = h;
+    vx = 0.0;
+    vy = 0.0;
+    count = 0;
+    box = new BoundingBox();
+
+}
+
+void FlockBox::move(){
+    x += vx*DT;
+    y += vy*DT;
+
+
+    BoundingBox* obox = target->getBoundingBox();
+    double ox = obox->x + 0.5*obox->w;
+    double oy = obox->y + 0.5*obox->h;
+
+    double dx = ox - x;
+    double dy = oy -y;
+    double m = dx*dx + dy*dy;
+    if(m > 4){
+
+        vx = 0.5*(vx + dx);
+        vy = 0.5*(vy + dy);
+
+    }
+
+}
+
+
+
+BoundingBox* FlockBox::getBoundingBox(){
+    float left = vx>0?0:-vx;
+    float bottom = vy>0?0:-vy;
+    box->x = x-width/2.0 - DT*left;
+    box->y = y-height/2.0 - DT*bottom;
+    box->w = width + DT*ABS(vx);
+    box->h = height + DT*ABS(vy);
+
+    return box;
+}
+
+void FlockBox::setTarget(DynamicObject *obj){
+    target=obj;
+}
+
 
 PlayerBox::PlayerBox(){
     x = 0;
@@ -162,14 +208,6 @@ BoundingBox* PlayerBox::getBoundingBox(){
     box->h = height + DT*ABS(vy);
 
     return box;
-}
-
-void PlayerBox::setToRemove(){
-    remove = true;
-}
-
-bool PlayerBox::toRemove(){
-    return remove;
 }
 
 void PlayerBox::impact(float rating){

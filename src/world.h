@@ -13,7 +13,7 @@ public:
 };
 
 class DynamicObject{
-
+    bool remove=false;
 public:
     float vx;
     float vy;
@@ -25,8 +25,8 @@ public:
     float rotation[4] = {1,0,0,1};
     virtual BoundingBox* getBoundingBox();
     virtual void move();
-    virtual bool toRemove();
-    virtual void setToRemove();
+    bool toRemove();
+    void setToRemove();
     virtual void impact(float rating);
     virtual void accelerate(float value){}
     virtual void steer(float value){}
@@ -34,16 +34,25 @@ public:
 
 };
 
+class FlockBox: public DynamicObject{
+    BoundingBox* box;
+    DynamicObject* target;
+    public:
+        FlockBox(float w, float h);
+        BoundingBox* getBoundingBox();
+        void setTarget(DynamicObject* obj);
+        void move();
+
+    ~FlockBox(){
+        delete box;
+    }
+};
+
 class BouncingBox: public DynamicObject{
     BoundingBox* box;
-    bool remove;
     public:
         BouncingBox(float w, float h);
         BoundingBox* getBoundingBox();
-        //void move();
-        bool toRemove();
-        void setToRemove();
-        //virtual void impact(float rating);
         ~BouncingBox(){
             delete box;
         }
@@ -59,8 +68,6 @@ class PlayerBox: public DynamicObject{
     public:
         PlayerBox();
         BoundingBox* getBoundingBox();
-        bool toRemove();
-        void setToRemove();
         void impact(float rating);
         void accelerate(float value);
         void steer(float value);
