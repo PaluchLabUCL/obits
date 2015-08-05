@@ -18,18 +18,16 @@ void DynamicsWorld::update(){
 
            obj->vx = -obj->vx;
            obj->impact(1.0f);
-           if(obj->count>10){
-               //to_remove.push(obj);
-           }
 
         }
 
         if(bb->y < -9.0 || bb->y + bb->h>9.0){
             obj->vy = -obj->vy;
             obj->impact(1.0f);
-            if(obj->count>10){
-                //to_remove.push(obj);
-            }
+        }
+
+        if(obj->isFinished()){
+            to_remove.push(obj);
         }
         /*
         std::list<DynamicObject*>::iterator odoi = doi;
@@ -90,6 +88,7 @@ void DynamicObject::impact(float rating){
 void DynamicObject::setToRemove(){
     remove = true;
 }
+
 bool DynamicObject::toRemove(){
 	return remove;
 }
@@ -125,6 +124,13 @@ BoundingBox* BouncingBox::getBoundingBox(){
     box->h = height + DT*ABS(vy);
 
     return box;
+}
+
+void BouncingBox::impact(float rating){
+    count += rating;
+    if(count>2){
+        setFinished();
+    }
 }
 
 FlockBox::FlockBox(float w, float h){
@@ -211,7 +217,7 @@ BoundingBox* PlayerBox::getBoundingBox(){
 }
 
 void PlayerBox::impact(float rating){
-    //just don't die.
+    count+= rating;
 }
 
 void PlayerBox::accelerate(float value){

@@ -67,7 +67,6 @@ void PlotWindow::showPlot(){
         glfwPollEvents();
 
         while(!dying.empty()){
-        	printf("killing!\n");
             Drawable* dead = dying.front();
             dying.pop();
             bool removed = false;

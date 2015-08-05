@@ -69,7 +69,6 @@ class Character : public Drawable{
             delete[] center;
             delete[] rotation_matrix;
             delete[] color;
-            printf("deleting!\n");
             delete obj;
         }
 

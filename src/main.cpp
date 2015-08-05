@@ -9,6 +9,7 @@
 
 void* start_main_loop(void* ptr);
 void generateFlockObjects(PlotWindow* win, DynamicsWorld* world, DynamicObject* target);
+void generateExplosionObject(PlotWindow* win, DynamicsWorld* world, DynamicObject* target);
 double randomNG();
 int main(int arg_no, char** args){
         
@@ -68,15 +69,14 @@ void* start_main_loop(void* ptr){
     c->setDynamicObject(obj);
     window->addDrawable(c);
     window->setPlayerCharacter(c);
-    int count = 0;
     while(true){
         glfwSetTime(0.0);
         world->update();
 
-        if(count>1e4){
-            generateFlockObjects(window, world, NULL);
-            count = 0;
-            printf("generated\n");
+        float c = obj->count;
+        if(c>0){
+            generateExplosionObject(window, world, obj);
+            obj->impact(-c);
         }
 
 
@@ -84,7 +84,6 @@ void* start_main_loop(void* ptr){
         if(left>0){
             usleep((int)(left*10000));
         }
-        count++;
     }
 
     return 0;
@@ -96,39 +95,45 @@ void generateFlockObjects(PlotWindow* win, DynamicsWorld* world, DynamicObject* 
         float w = 0.02;
         float h = 0.02;
 
-        if(target!=NULL){
-            FlockBox* obj = new FlockBox(w,h);
-            obj->setTarget(target);
-            world->addDynamicObject(obj);
+        FlockBox* obj = new FlockBox(w,h);
+        obj->setTarget(target);
+        world->addDynamicObject(obj);
 
-            obj->vx = cos(i*3.14*0.004);
-            obj->vy = sin(i*3.14*0.004);
-
-
-            obj->vx = cos(i*3.14*0.004);
-            obj->vy = sin(i*3.14*0.004);
-
-            Character* c = new Character(w, h);
-            c->setColor((i%51)/50.0f, (i%25)/20.0f, 1.0f);
-            c->setDynamicObject(obj);
-            win->addDrawable(c);
-        } else{
-            BouncingBox* obj = new BouncingBox(w,h);
-
-            world->addDynamicObject(obj);
-
-            obj->vx = cos(i*3.14*0.004);
-            obj->vy = sin(i*3.14*0.004);
+        obj->vx = cos(i*3.14*0.004);
+        obj->vy = sin(i*3.14*0.004);
 
 
-            obj->x = (0.5 - 1.0*randomNG())*3;
-            obj->y = (0.5 - 1.0*randomNG())*3;
+        obj->vx = cos(i*3.14*0.004);
+        obj->vy = sin(i*3.14*0.004);
 
-            Character* c = new Character(w, h);
-            c->setColor((i%51)/50.0f, (i%25)/20.0f, 1.0f);
-            c->setDynamicObject(obj);
-            win->addDrawable(c);
-        }
+        Character* c = new Character(w, h);
+        c->setColor((i%51)/50.0f, (i%25)/20.0f, 1.0f);
+        c->setDynamicObject(obj);
+        win->addDrawable(c);
+    }
+}
+
+void generateExplosionObject(PlotWindow* win, DynamicsWorld* world, DynamicObject* target){
+    for(int i = 0; i<100; i++){
+
+        float w = 0.02;
+        float h = 0.02;
+
+        BouncingBox* obj = new BouncingBox(w,h);
+
+        world->addDynamicObject(obj);
+
+        obj->vx = cos(i*3.14*0.02);
+        obj->vy = sin(i*3.14*0.02);
+
+
+        obj->x = target->x;
+        obj->y = target->y;
+
+        Character* c = new Character(w, h);
+        c->setColor((i%51)/50.0f, (i%25)/20.0f, 1.0f);
+        c->setDynamicObject(obj);
+        win->addDrawable(c);
 
     }
 }

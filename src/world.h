@@ -14,6 +14,7 @@ public:
 
 class DynamicObject{
     bool remove=false;
+    bool finished=false;
 public:
     float vx;
     float vy;
@@ -26,6 +27,8 @@ public:
     virtual BoundingBox* getBoundingBox();
     virtual void move();
     bool toRemove();
+    bool isFinished(){return finished;}
+    void setFinished(){finished=true;}
     void setToRemove();
     virtual void impact(float rating);
     virtual void accelerate(float value){}
@@ -53,6 +56,7 @@ class BouncingBox: public DynamicObject{
     public:
         BouncingBox(float w, float h);
         BoundingBox* getBoundingBox();
+        void impact(float rating);
         ~BouncingBox(){
             delete box;
         }
