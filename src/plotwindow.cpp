@@ -10,13 +10,16 @@ void PlotWindow::showPlot(){
     }
 
     GLuint theProgram = Framework::loadProgram();
-
+    GLuint backgroundProgram = Framework::loadBackgroundProgram();
     GetError();
-
+    Background* bg = new Background();
+    bg->bufferData(backgroundProgram);
     int height, width;
     glfwGetWindowSize(window, &width, &height );
 
-    camera = new PlotCamera(theProgram);
+    camera = new PlotCamera();
+    camera->addProgram(theProgram);
+    camera->addProgram(backgroundProgram);
 
     camera->resizeWindow((float)width, (float)height);
 
@@ -31,7 +34,7 @@ void PlotWindow::showPlot(){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         input->update();
-
+        bg->draw();
         if(setting){
             input->setCharacter(setting);
             player=setting;

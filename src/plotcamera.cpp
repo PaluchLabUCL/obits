@@ -1,6 +1,6 @@
 #include "plotcamera.h"
 
-PlotCamera::PlotCamera(GLuint &theProgram){
+PlotCamera::PlotCamera(){
 
     scaleMatrix = new float[4];
     scaleMatrix[0] = 1.0;
@@ -12,29 +12,28 @@ PlotCamera::PlotCamera(GLuint &theProgram){
     offset[0] = 0.0;
     offset[1] = 0.0;
 
-    color= new float[4];
-    for(int i = 0; i<4; i++){
-        color[i] = 1.0;
-    }
     center = new float[2];
     center[0] = 0;
     center[1] = 0;
 
-    this->theProgram=theProgram;
-
-    setUniforms(theProgram);
+    setUniforms();
 }
 
-void PlotCamera::setUniforms(GLuint &theProgram){
-    GLuint scaleUnif = glGetUniformLocation(theProgram, "scale");
-    GLuint offsetUnif = glGetUniformLocation(theProgram, "offset");
-    GLuint colorUnif = glGetUniformLocation(theProgram, "plotColor");
+void PlotCamera::setUniforms(){
+    for(GLuint theProgram: programs){
+        GLuint scaleUnif = glGetUniformLocation(theProgram, "scale");
+        GLuint offsetUnif = glGetUniformLocation(theProgram, "offset");
 
-    glUseProgram(theProgram);
-    glUniformMatrix2fv(scaleUnif, 1, GL_FALSE, scaleMatrix);
-    glUniform2fv(offsetUnif, 1, offset);
-    glUniform4fv(colorUnif, 1, color);
-    glUseProgram(0);
+        glUseProgram(theProgram);
+        glUniformMatrix2fv(scaleUnif, 1, GL_FALSE, scaleMatrix);
+        glUniform2fv(offsetUnif, 1, offset);
+
+        glUseProgram(0);
+    }
+}
+
+void PlotCamera::addProgram(GLuint &program){
+    programs.push_back(program);
 }
 
 
@@ -54,7 +53,7 @@ void PlotCamera::resizeWindow(float w, float h){
     scaleMatrix[0] = 2.0f/(xmax - xmin);
     scaleMatrix[3] = 2.0f/(ymax - ymin);
 
-    setUniforms(theProgram);
+    setUniforms();
 }
 
 void PlotCamera::trackPoint(float x, float y){

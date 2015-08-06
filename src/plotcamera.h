@@ -8,10 +8,11 @@ class PlotCamera{
     float* offset;
     float* center;
     float* color;
-    GLuint theProgram;
-    void setUniforms(GLuint &theProgram);
+    std::vector<GLuint> programs;
+    void setUniforms();
     public:
-        PlotCamera(GLuint &theProgram);
+        PlotCamera();
+        void addProgram(GLuint &program);
         void resizeWindow(float w, float h);
         void trackPoint(float x, float y);
 };

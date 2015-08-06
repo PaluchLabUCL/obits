@@ -4,7 +4,7 @@
 #include "plot.h"
 #include "plotcamera.h"
 #include "plotinteractor.h"
-
+#include "background.h"
 class PlotWindow{
     PlotCamera* camera;
     GLFWwindow* window;

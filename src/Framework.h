@@ -34,6 +34,7 @@ namespace Framework
     float* multiplyMatrixVector4(float* A, float* b);
     GLFWwindow* initializeWindow();
     GLuint loadProgram();
+    GLuint loadBackgroundProgram();
 }
 
 #endif //FRAMEWORK_H

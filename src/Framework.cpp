@@ -188,7 +188,7 @@ GLFWwindow* initializeWindow(){
     printf("GLSL version %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
     printf("GL Version: %s\n", glGetString(GL_VERSION));
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     
     /*glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
@@ -214,5 +214,14 @@ GLuint loadProgram(){
     GetError();
     return Framework::CreateProgram(shaderList);
 
+}
+
+GLuint loadBackgroundProgram(){
+    std::vector<GLuint> shaderList;
+
+    shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "background.vert"));
+    shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "background.frag"));
+    GetError();
+    return Framework::CreateProgram(shaderList);
 }
 }
