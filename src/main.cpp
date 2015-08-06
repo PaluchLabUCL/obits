@@ -2,10 +2,10 @@
  * For making a simple plot, and testing orbits.
  * 
  **/
-#include "plot.h"
 #include <stdio.h>
 #include "world.h"
 #include <math.h>
+#include "plotwindow.h"
 
 void* start_main_loop(void* ptr);
 void generateFlockObjects(PlotWindow* win, DynamicsWorld* world, DynamicObject* target);

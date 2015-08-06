@@ -14,6 +14,7 @@ void DynamicsWorld::update(){
         DynamicObject* obj = *doi;
 
         BoundingBox* bb = obj->getBoundingBox();
+        /*
         if( (bb->x<-9.0) || bb->x + bb->w>9.0 ){
 
            obj->vx = -obj->vx;
@@ -25,7 +26,7 @@ void DynamicsWorld::update(){
             obj->vy = -obj->vy;
             obj->impact(1.0f);
         }
-
+        */
         if(obj->isFinished()){
             to_remove.push(obj);
         }
@@ -81,26 +82,6 @@ int DynamicsWorld::objectCount(){
     return dynamic_objects.size();
 }
 
-void DynamicObject::impact(float rating){
-    count += rating;
-}
-
-void DynamicObject::setToRemove(){
-    remove = true;
-}
-
-bool DynamicObject::toRemove(){
-	return remove;
-}
-
-void DynamicObject::move(){
-    x += vx*DT;
-    y += vy*DT;
-}
-
-BoundingBox* DynamicObject::getBoundingBox(){
-    return 0;
-}
 
 BouncingBox::BouncingBox(float w, float h){
     x = 0;
