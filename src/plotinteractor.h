@@ -1,7 +1,10 @@
 #ifndef PLOTINTERACTOR_H
 #define PLOTINTERACTOR_H
-#include "plot.h"
+
 #include "plotcamera.h"
+#include "character.h"
+#include "Framework.h"
+
 class PlotInteractor{
     GLFWwindow* window;
     static Character* character;

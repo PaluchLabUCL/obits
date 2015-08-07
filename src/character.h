@@ -1,20 +1,10 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-#ifndef __APPLE__
-    #include <GL/glew.h>
-    #define DEBUG
-#else
-    #define GLFW_INCLUDE_GLCOREARB
-    #define GLFW_NO_GLU
-#endif
-
 #include "drawable.h"
 #include "dynamicobject.h"
 #include <iostream>
 
-const float ORIGIN[] = {0.0f, 0.0f};
-const float IDENTITY[] = {1.0f, 0.0f, 0.0f, 1.0f};
 
 class Character : public Drawable{
     float* positionBuffer;

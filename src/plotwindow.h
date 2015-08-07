@@ -1,10 +1,12 @@
 #ifndef PLOTWINDOW_H
 #define PLOTWINDOW_H
 
-#include "plot.h"
 #include "plotcamera.h"
 #include "plotinteractor.h"
 #include "background.h"
+#include <list>
+#include <queue>
+
 class PlotWindow{
     PlotCamera* camera;
     GLFWwindow* window;

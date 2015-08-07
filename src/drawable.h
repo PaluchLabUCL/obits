@@ -1,16 +1,9 @@
 #ifndef DRAWABLE_H
 #define DRAWABLE_H
 
-#ifndef __APPLE__
-    #include <GL/glew.h>
-    #define DEBUG
-#else
-    #define GLFW_INCLUDE_GLCOREARB
-    #define GLFW_NO_GLU
-#endif
-
-#include "GLFW/glfw3.h"
-#include "error.h"
+#include "Framework.h"
+const float ORIGIN[] = {0.0f, 0.0f};
+const float IDENTITY[] = {1.0f, 0.0f, 0.0f, 1.0f};
 
 class Drawable{
 

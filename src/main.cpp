@@ -6,7 +6,8 @@
 #include "world.h"
 #include <math.h>
 #include "plotwindow.h"
-
+#include "plot.h"
+#include <unistd.h>
 void* start_main_loop(void* ptr);
 void generateFlockObjects(PlotWindow* win, DynamicsWorld* world, DynamicObject* target);
 void generateExplosionObject(PlotWindow* win, DynamicsWorld* world, DynamicObject* target);

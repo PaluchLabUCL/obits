@@ -109,53 +109,6 @@ namespace Framework
     
 
 
-#ifndef __APPLE__
-GLuint initializeWindow(){
-    
-    if( glfwInit() != GL_TRUE ) {
-        exit( EXIT_FAILURE );
-    }
-    printf("glfw initted\n");
-    
-    // Open an OpenGL window
-    if( !glfwOpenWindow( 1024,800, 0,0,0,0,0,32, GLFW_WINDOW ) )
-    {
-        glfwTerminate();
-        exit( EXIT_FAILURE );
-    }
-    glewInit();
-    
-    glfwSetWindowTitle("OpenGL plotting window");
-    
-    printf("GLSL version %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    printf("GL Version: %s", glGetString(GL_VERSION));
-    
-    glLoadIdentity();
-    
-    glEnable(GL_DEPTH_TEST);
-    
-    glDepthFunc(GL_LEQUAL);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-    glDepthRange(0.0f, 1.0f);
-    
-    glClearColor( 0.02f, 0.02f, 0.02f, 0.0f );
-    glClearDepth( 1.0f );
-	glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
-    
-    printf("setup\n");
-    //Load program.
-    std::vector<GLuint> shaderList;
-	
-	shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "vertex.shader"));
-	shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "fragment.shader"));
-    GetError();
-	return Framework::CreateProgram(shaderList);
-    
-}
-#else
 
 GLFWwindow* initializeWindow(){
     /*
@@ -187,30 +140,19 @@ GLFWwindow* initializeWindow(){
 
     printf("GLSL version %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
     printf("GL Version: %s\n", glGetString(GL_VERSION));
-
-    //glEnable(GL_DEPTH_TEST);
     
-    /*glDepthFunc(GL_LEQUAL);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
-    glDepthRange(0.0f, 1.0f);
-    */
     glClearColor( 0.02f, 0.02f, 0.02f, 0.0f );
     glClearDepth( 1.0f );
-    /*glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);*/
     printf("window setup complete\n");
     return window;
 }
 
-#endif
 GLuint loadProgram(){
     //Load program.
     std::vector<GLuint> shaderList;
 
-    shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "vertex.shader"));
-    shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "fragment.shader"));
+    shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "shaders/vertex.shader"));
+    shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "shaders/fragment.shader"));
     GetError();
     return Framework::CreateProgram(shaderList);
 
@@ -219,8 +161,8 @@ GLuint loadProgram(){
 GLuint loadBackgroundProgram(){
     std::vector<GLuint> shaderList;
 
-    shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "background.vert"));
-    shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "background.frag"));
+    shaderList.push_back(Framework::LoadShader(GL_VERTEX_SHADER, "shaders/background.vert"));
+    shaderList.push_back(Framework::LoadShader(GL_FRAGMENT_SHADER, "shaders/background.frag"));
     GetError();
     return Framework::CreateProgram(shaderList);
 }

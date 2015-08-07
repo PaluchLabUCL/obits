@@ -1,7 +1,7 @@
 #ifndef PLOTCAMERA_H
 #define PLOTCAMERA_H
 
-#include "plot.h"
+#include "Framework.h"
 
 class PlotCamera{
     float* scaleMatrix;
