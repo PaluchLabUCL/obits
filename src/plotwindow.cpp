@@ -1,9 +1,13 @@
 #include "plotwindow.h"
 
+void keyPressedStatic(GLFWwindow* window, int key, int scancode, int action, int mods){
+    printf("pressed\n");
+};
+
 void PlotWindow::showPlot(){
     printf("initting glfw\n");
     window = Framework::initializeWindow();
-
+    glfwSetKeyCallback(window, keyPressedStatic);
     if(window==0){
         printf("failed to load glfw\n");
         exit(1);

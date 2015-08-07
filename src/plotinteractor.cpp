@@ -1,10 +1,11 @@
 #include "plotinteractor.h"
 
 Character* PlotInteractor::character = 0;
+
 PlotInteractor::PlotInteractor(PlotCamera* cam, GLFWwindow* win){
     window = win;
-    //character = (Character*)0;
     running=GL_TRUE;
+
 }
 
 

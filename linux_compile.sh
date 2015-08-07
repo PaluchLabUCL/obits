@@ -1,8 +1,10 @@
 
 GLFWDIR="/Users/msmith/Documents/development/c/orbits"
-cd src
-g++ -std=gnu++11 -I"../include" -pthread \
--lglfw -lGLU -lGL -lGLEW -lX11 -lXrandr -ldl -lm \
-main.cpp Framework.cpp plot.cpp -o ../build/plot_window
+
+export GLFW_PC="$GLFW3_HOME"/lib/pkgconfig/glfw3.pc
+export GLFW_CFLAGS=$(pkg-config --cflags "$GLFW_PC")
+export GLFW_LIBS=$(pkg-config --static --libs "$GLFW_PC")
+
+g++ -std=c++11 $GLFW_CFLAGS src/*.cpp -lGLEW $GLFW_LIBS -o build/orbits
+
 cd ..
-cp shaders/* build/

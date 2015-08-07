@@ -6,7 +6,7 @@
 #include "background.h"
 #include <list>
 #include <queue>
-
+#include <mutex>
 class PlotWindow{
     PlotCamera* camera;
     GLFWwindow* window;

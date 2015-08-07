@@ -111,40 +111,44 @@ namespace Framework
 
 
 GLFWwindow* initializeWindow(){
-    /*
-     *Creating and initlizing a window on mac.
-     *
-     **/
+        
     GLFWwindow* window;
-
-    /* Initialize the library */
-    if (!glfwInit()){
-        printf("could not initialize window\n");
-        return (GLFWwindow*)0;
+        
+    if (!glfwInit())  {
+        exit( EXIT_FAILURE );
     }
+        
+        
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        
 
-    window = glfwCreateWindow(640, 480, "orbits", NULL, NULL);
-    if (!window)
-    {
-        printf("failed to create window\n");
-        glfwTerminate();
-        return (GLFWwindow*)0;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
-    printf("GLSL version %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    printf("GL Version: %s\n", glGetString(GL_VERSION));
-    
-    glClearColor( 0.02f, 0.02f, 0.02f, 0.0f );
-    glClearDepth( 1.0f );
-    printf("window setup complete\n");
-    return window;
+    window = glfwCreateWindow(640, 480, "Orbits", NULL, NULL);
+	glfwMakeContextCurrent(window);
+	
+#ifndef __APPLE__
+	glewExperimental=true;
+	glewInit();
+#endif
+        
+	if (!window)
+	{
+		glfwTerminate();
+		return 0;
+	}
+        
+        
+	printf("GLSL version %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	printf("GL Version: %s\n", glGetString(GL_VERSION));
+        
+	glClearColor( 0.02f, 0.02f, 0.02f, 0.0f );
+	glClearDepth( 1.0f );
+	printf("setup\n");
+        
+	return window;
+        
 }
 
 GLuint loadProgram(){
