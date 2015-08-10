@@ -1,6 +1,6 @@
 out vec4 outputColor;
 in vec2 texCoords;
-uniform sampler2D texSampler;
+uniform sampler2DArray texSamplers;
 void main(){
-   outputColor = texture(texSampler, texCoords)/4;
+   outputColor = texture(texSamplers, vec3(texCoords, 3));
 }

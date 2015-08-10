@@ -135,7 +135,7 @@ void generateExplosionObject(PlotWindow* win, DynamicsWorld* world, DynamicObjec
         c->setColor((i%51)/50.0f, (i%25)/20.0f, 1.0f);
         c->setDynamicObject(obj);
         win->addDrawable(c);
-
+        target = obj;
     }
 }
 

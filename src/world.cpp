@@ -212,12 +212,14 @@ void PlayerBox::steer(float value){
 void PlayerBox::move(){
     velocity = sqrt(vx*vx + vy*vy);
 
+    /*
     if(velocity>0){
         rotation[0] = vy/velocity;
         rotation[1] = -vx/velocity;
         rotation[2] = vx/velocity;
         rotation[3] = vy/velocity;
     }
+    */
 
     if(alpha!=0){
         float a = cos(-alpha*0.0005);
@@ -236,10 +238,13 @@ void PlayerBox::move(){
 
     }
 
-    velocity = 0.995*velocity + acc*DT;
-
+    //velocity = 0.995*velocity + acc*DT;
+    vx = 0.995*vx + -acc*DT*rotation[1];
+    vy = 0.995*vy + acc*DT*rotation[0];
+    /*
     vx = rotation[2]*velocity;
     vy = rotation[0]*velocity;
+    */
 
     x += vx*DT;
     y += vy*DT;

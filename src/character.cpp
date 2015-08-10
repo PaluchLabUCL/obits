@@ -77,8 +77,8 @@ void Character::initialize(GLuint &proggy){
     */
     //positionBuffer = new float[8];
     positionBuffer[0] = -width;
-    positionBuffer[2] = -width;
-    positionBuffer[4] = width;
+    positionBuffer[2] = -0.9*width;
+    positionBuffer[4] = 0.9*width;
     positionBuffer[6] = width;
     positionBuffer[1] = -height;
     positionBuffer[3] = height;
