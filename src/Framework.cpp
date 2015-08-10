@@ -129,8 +129,7 @@ GLFWwindow* initializeWindow(){
 	glfwMakeContextCurrent(window);
 	
 #ifndef __APPLE__
-	glewExperimental=true;
-	glewInit();
+	glxwInit();
 #endif
         
 	if (!window)
