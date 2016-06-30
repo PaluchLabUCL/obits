@@ -1,4 +1,5 @@
 #include "background.h"
+#include <math.h>
 Background::Background()
 {
     generateTiles();
@@ -35,12 +36,12 @@ void Background::bufferData(GLuint &program){
 
     glGenTextures(1, &texBufferdObject);
     glBindTexture(GL_TEXTURE_2D_ARRAY, texBufferdObject);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 8, 8, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL  );
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA8, 2*textures[0]->width, 2*textures[0]->height, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL  );
 
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, 4, 4, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[0]->img);
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 4, 0, 0, 4, 4, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[1]->img);
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 4, 4, 0, 4, 4, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[2]->img);
-    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 4, 0, 4, 4, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[3]->img);
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, textures[0]->width, textures[0]->height, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[0]->img);
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, textures[0]->width, 0, 0, textures[0]->width, textures[0]->height, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[1]->img);
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, textures[0]->width, textures[0]->height, 0, textures[0]->width, textures[0]->height, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[2]->img);
+    glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, textures[0]->height, 0, textures[0]->width, textures[0]->height, 1, GL_RGBA, GL_UNSIGNED_BYTE, textures[3]->img);
 
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
@@ -60,7 +61,8 @@ void Background::bufferData(GLuint &program){
 void Background::generateTiles(){
     //same thing we have now
     for(int i = 0; i<4; i++){
-        textures.push_back(new BackgroundTile(4, 4, 0xff000000^(0x55<<(8*(i%3)))) );
+        int color = 0xff000000 + (0xff<<(8*(i%3))) + (i/3)*(0xffff<<8);
+        textures.push_back(new BackgroundTile(16, 16, color) );
     }
 }
 
@@ -85,13 +87,26 @@ BackgroundTile::BackgroundTile(int width, int height, int color){
     GLubyte g = 0xff&(color>>8);
     GLubyte b = 0xff&(color);
     GLubyte a = 0xff&(color>>24);
-    printf("%d, %d, %d, %d\n", r, g, b, a);
+
     img = new GLubyte[4*width*height];
+    int cx = width/2;
+    int cy = height/2;
+    float factor;
     for(int i = 0; i<width*height; i++){
+        int dx = i/width - cx;
+        int dy = i%width - cy;
+        float r = dx*dx + dy*dy;
+
+        if(r>0){
+
+            factor = 1.0/pow(r, 0.75);
+        } else{
+            factor = 1;
+        }
         GLubyte* o = &img[4*i];
-        o[0] = r;
-        o[1] = g;
-        o[2] = b;
-        o[3] = a;
+        o[3] = GLubyte(r*factor);
+        o[1] = GLubyte(g*factor);;
+        o[2] = GLubyte(b*factor);;
+        o[0] = GLubyte(a*factor);
     }
 }

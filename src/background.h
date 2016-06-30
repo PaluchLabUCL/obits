@@ -26,9 +26,10 @@ const float positions[] = {
 const int texUnit=0;
 
 class BackgroundTile{
+
+public:
     int width;
     int height;
-public:
     GLubyte* img;
     BackgroundTile(int width, int height, int color);
     ~BackgroundTile(){
