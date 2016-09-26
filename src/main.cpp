@@ -121,7 +121,7 @@ void generateExplosionObject(PlotWindow* win, DynamicsWorld* world, DynamicObjec
         float h = 0.02;
 
         BouncingBox* obj = new BouncingBox(w,h);
-
+        obj->setDuration(20*randomNG());
         world->addDynamicObject(obj);
 
         obj->vx = cos(i*3.14*0.02);

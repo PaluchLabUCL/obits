@@ -114,6 +114,17 @@ void BouncingBox::impact(float rating){
     }
 }
 
+void BouncingBox::move(){
+    DynamicObject::move();
+    if(timeOut>=0){
+        timeOut -= DT;
+        if(timeOut<0){
+            setFinished();
+        }
+    }
+    
+}
+
 FlockBox::FlockBox(float w, float h){
     x = 0;
     y = 0;

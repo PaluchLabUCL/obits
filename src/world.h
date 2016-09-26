@@ -22,10 +22,13 @@ class FlockBox: public DynamicObject{
 
 class BouncingBox: public DynamicObject{
     BoundingBox* box;
+    double timeOut = -1;
     public:
         BouncingBox(float w, float h);
         BoundingBox* getBoundingBox();
         void impact(float rating);
+        void move();
+        void setDuration(double t){timeOut=t;}
         ~BouncingBox(){
             delete box;
         }

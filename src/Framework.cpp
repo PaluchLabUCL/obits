@@ -123,28 +123,30 @@ GLFWwindow* initializeWindow(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        
-
     window = glfwCreateWindow(640, 480, "Orbits", NULL, NULL);
-	glfwMakeContextCurrent(window);
-	
-#ifndef __APPLE__
-	glxwInit();
-#endif
-        
+    GetError();
+    printf("to\n");
+    glfwMakeContextCurrent(window);
+
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
+    {
+        glfwTerminate();
+        printf("Failed to initialize OpenGL context\n");
+        return 0;
+    }
+
 	if (!window)
 	{
 		glfwTerminate();
 		return 0;
 	}
-        
-        
 	printf("GLSL version %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 	printf("GL Version: %s\n", glGetString(GL_VERSION));
-        
+
 	glClearColor( 0.02f, 0.02f, 0.02f, 0.0f );
 	glClearDepth( 1.0f );
-	printf("setup\n");
+    
+    printf("setup\n");
         
 	return window;
         
